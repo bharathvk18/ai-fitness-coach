@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Fitness Coach</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-green-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <!-- Header -->
+        <div class="text-center mb-8 fade-in">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">
+                💪 AI Fitness Coach
+            </h1>
+            <p class="text-gray-600 text-lg">
+                Get your personalized workout and diet plan - Powered by AI!
+            </p>
+        </div>
+
+        <!-- User Form -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 mb-8 fade-in">
+            <h2 class="text-2xl font-semibold mb-6">Tell Me About Yourself</h2>
+            
+            <form id="fitnessForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Personal Info -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Name</label>
+                    <input type="text" name="name" required
+                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Age</label>
+                    <input type="number" name="age" required
+                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Gender</label>
+                    <select name="gender" required
+                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="">Select</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Height (cm)</label>
+                    <input type="number" name="height" required
+                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Weight (kg)</label>
+                    <input type="number" name="weight" required
+                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <!-- Fitness Preferences -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Fitness Goal</label>
+                    <select name="goal" required
+                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="weight_loss">Weight Loss</option>
+                        <option value="muscle_gain">Muscle Gain</option>
+                        <option value="maintenance">Maintenance</option>
+                        <option value="endurance">Endurance</option>
+                    </select>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Fitness Level</label>
+                    <select name="level" required
+                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="beginner">Beginner</option>
+                        <option value="intermediate">Intermediate</option>
+                        <option value="advanced">Advanced</option>
+                    </select>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Workout Location</label>
+                    <select name="location" required
+                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="home">Home</option>
+                        <option value="gym">Gym</option>
+                        <option value="outdoor">Outdoor</option>
+                    </select>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Dietary Preference</label>
+                    <select name="diet" required
+                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="vegetarian">Vegetarian</option>
+                        <option value="non-vegetarian">Non-Vegetarian</option>
+                        <option value="vegan">Vegan</option>
+                        <option value="keto">Keto</option>
+                    </select>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="md:col-span-2">
+                    <button type="submit" id="generateBtn"
+                        class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-dumbbell mr-2"></i>
+                        Generate My Fitness Plan
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Plan Display -->
+        <div id="planDisplay" class="hidden bg-white rounded-2xl shadow-lg p-6 fade-in">
+            <!-- Content will be filled by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        // AI Fitness Data - Built into the page!
+        const aiFitnessData = {
+            weight_loss: {
+                workoutPlan: {
+                    description: "🔥 Weight Loss Focus: High-intensity workouts to maximize fat burning and boost metabolism!",
+                    weeklySchedule: [
+                        {
+                            day: "Monday - Full Body HIIT",
+                            focus: "Fat Burning",
+                            exercises: [
+                                {
+                                    name: "Jumping Jacks",
+                                    sets: "4",
+                                    reps: "45 seconds",
+                                    rest: "15s",
+                                    instructions: "Start with feet together, jump while spreading legs and raising arms overhead"
+                                },
+                                {
+                                    name: "Bodyweight Squats",
+                                    sets: "3",
+                                    reps: "15-20",
+                                    rest: "30s",
+                                    instructions: "Feet shoulder-width apart, lower as if sitting, keep chest up and back straight"
+                                },
+                                {
+                                    name: "Push-ups",
+                                    sets: "3",
+                                    reps: "12-15",
+                                    rest: "45s",
+                                    instructions: "Keep body straight in plank position, lower chest to floor, push back up"
+                                },
+                                {
+                                    name: "Mountain Climbers",
+                                    sets: "4",
+                                    reps: "30 seconds",
+                                    rest: "30s",
+                                    instructions: "In push-up position, alternate bringing knees to chest quickly"
+                                }
+                            ]
+                        },
+                        {
+                            day: "Wednesday - Cardio Core",
+                            focus: "Core & Endurance",
+                            exercises: [
+                                {
+                                    name: "High Knees",
+                                    sets: "5",
+                                    reps: "45 seconds",
+                                    rest: "20s",
+                                    instructions: "Run in place while bringing knees up to chest level, keep core engaged"
+                                },
+                                {
+                                    name: "Plank",
+                                    sets: "3",
+                                    reps: "30-45 seconds",
+                                    rest: "30s",
+                                    instructions: "Hold push-up position on elbows, keep body straight from head to heels"
+                                },
+                                {
+                                    name: "Burpees",
+                                    sets: "4",
+                                    reps: "10-12",
+                                    rest: "45s",
+                                    instructions: "Squat down, kick feet back, do push-up, return to squat, jump up"
+                                }
+                            ]
+                        },
+                        {
+                            day: "Friday - Strength & Conditioning",
+                            focus: "Full Body Tone",
+                            exercises: [
+                                {
+                                    name: "Lunges",
+                                    sets: "3",
+                                    reps: "12 each leg",
+                                    rest: "45s",
+                                    instructions: "Step forward, lower hips until both knees are bent at 90-degree angles"
+                                },
+                                {
+                                    name: "Tricep Dips",
+                                    sets: "3",
+                                    reps: "12-15",
+                                    rest: "45s",
+                                    instructions: "Use chair or floor, lower body by bending elbows, push back up"
+                                },
+                                {
+                                    name: "Bicycle Crunches",
+                                    sets: "3",
+                                    reps: "20 each side",
+                                    rest: "30s",
+                                    instructions: "Lie on back, alternate bringing elbow to opposite knee in cycling motion"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                dietPlan: {
+                    description: "🍽️ Calorie-controlled diet with high protein and fiber to support weight loss while maintaining energy",
+                    dailyCalories: "1600-1800",
+                    macronutrients: {
+                        protein: "80-90g",
+                        carbs: "180-200g",
+                        fats: "45-55g"
+                    },
+                    meals: {
+                        breakfast: "2 boiled eggs + 1 slice whole wheat toast + 1 apple + green tea",
+                        lunch: "Large green salad with 150g grilled chicken/tofu + olive oil dressing + 1/2 cup quinoa",
+                        dinner: "Steamed vegetables (broccoli, carrots, bell peppers) + 100g lean protein + 1/2 cup brown rice",
+                        snacks: "Greek yogurt with berries, handful of almonds, carrot sticks with hummus"
+                    }
+                },
+                motivationalTips: [
+                    "Every workout brings you closer to your goal! Consistency is key 💪",
+                    "Drink 2-3 liters of water daily - it boosts metabolism and reduces hunger 💧",
+                    "Track your progress with photos and measurements, not just the scale 📈",
+                    "Remember: It's a marathon, not a sprint. Small daily efforts lead to big results 🌟"
+                ]
+            },
+            muscle_gain: {
+                workoutPlan: {
+                    description: "💪 Muscle Building Focus: Strength training with progressive overload for maximum muscle growth!",
+                    weeklySchedule: [
+                        {
+                            day: "Monday - Chest & Triceps",
+                            focus: "Upper Body Push",
+                            exercises: [
+                                {
+                                    name: "Push-ups",
+                                    sets: "4",
+                                    reps: "12-15",
+                                    rest: "60s",
+                                    instructions: "Focus on full range of motion, chest to floor, explode on the way up"
+                                },
+                                {
+                                    name: "Incline Push-ups",
+                                    sets: "3",
+                                    reps: "10-12",
+                                    rest: "60s",
+                                    instructions: "Hands on elevated surface, targets upper chest"
+                                },
+                                {
+                                    name: "Diamond Push-ups",
+                                    sets: "3",
+                                    reps: "8-12",
+                                    rest: "60s",
+                                    instructions: "Hands close together forming diamond shape, targets triceps"
+                                },
+                                {
+                                    name: "Tricep Dips",
+                                    sets: "3",
+                                    reps: "12-15",
+                                    rest: "60s",
+                                    instructions: "Use chair or bench, lower until elbows at 90 degrees"
+                                }
+                            ]
+                        },
+                        {
+                            day: "Wednesday - Back & Biceps",
+                            focus: "Upper Body Pull",
+                            exercises: [
+                                {
+                                    name: "Pull-ups",
+                                    sets: "4",
+                                    reps: "As many as possible",
+                                    rest: "90s",
+                                    instructions: "Use underhand grip, pull chest to bar, controlled descent"
+                                },
+                                {
+                                    name: "Bodyweight Rows",
+                                    sets: "4",
+                                    reps: "10-12",
+                                    rest: "60s",
+                                    instructions: "Use table or bar, keep body straight, pull chest to surface"
+                                },
+                                {
+                                    name: "Chin-ups",
+                                    sets: "3",
+                                    reps: "As many as possible",
+                                    rest: "90s",
+                                    instructions: "Palms facing you, focuses on biceps"
+                                },
+                                {
+                                    name: "Inverted Rows",
+                                    sets: "3",
+                                    reps: "10-15",
+                                    rest: "60s",
+                                    instructions: "Under bar, pull body up until chest touches bar"
+                                }
+                            ]
+                        },
+                        {
+                            day: "Friday - Legs & Shoulders",
+                            focus: "Lower Body & Delts",
+                            exercises: [
+                                {
+                                    name: "Pistol Squats",
+                                    sets: "3",
+                                    reps: "6-8 each leg",
+                                    rest: "75s",
+                                    instructions: "Single leg squat, use support if needed, builds incredible leg strength"
+                                },
+                                {
+                                    name: "Bulgarian Split Squats",
+                                    sets: "3",
+                                    reps: "10-12 each leg",
+                                    rest: "60s",
+                                    instructions: "Back foot elevated, focus on depth and control"
+                                },
+                                {
+                                    name: "Pike Push-ups",
+                                    sets: "4",
+                                    reps: "10-12",
+                                    rest: "60s",
+                                    instructions: "Hips raised, targets shoulders similar to overhead press"
+                                },
+                                {
+                                    name: "Lateral Raises",
+                                    sets: "3",
+                                    reps: "15-20",
+                                    rest: "45s",
+                                    instructions: "Use water bottles or light weights, raise arms to shoulder height"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                dietPlan: {
+                    description: "🥩 High-protein diet to support muscle growth, repair, and recovery with adequate calories for gains",
+                    dailyCalories: "2800-3200",
+                    macronutrients: {
+                        protein: "120-140g",
+                        carbs: "350-400g",
+                        fats: "70-85g"
+                    },
+                    meals: {
+                        breakfast: "3-4 egg omelette with cheese + 2 slices whole wheat toast + 1 banana + protein shake",
+                        lunch: "200g chicken breast/fish + 1.5 cups rice + mixed vegetables + avocado",
+                        dinner: "200g lean protein (beef/tofu) + large sweet potato + green vegetables + olive oil",
+                        snacks: "Protein shake, Greek yogurt with nuts, peanut butter sandwiches, fruits, cottage cheese"
+                    }
+                },
+                motivationalTips: [
+                    "Muscle grows during rest - aim for 7-9 hours of sleep nightly 😴",
+                    "Track your strength gains - increasing reps/weight shows progress 📈",
+                    "Eat to fuel your workouts - nutrition is 50% of muscle building 🍗",
+                    "Be patient - muscle growth takes time but results are worth it 💯"
+                ]
+            },
+            maintenance: {
+                workoutPlan: {
+                    description: "⚖️ Maintenance Focus: Balanced workouts to maintain fitness, improve tone, and support overall health!",
+                    weeklySchedule: [
+                        {
+                            day: "Monday - Total Body",
+                            focus: "Full Body Strength",
+                            exercises: [
+                                {
+                                    name: "Squats",
+                                    sets: "3",
+                                    reps: "15",
+                                    rest: "45s",
+                                    instructions: "Maintain proper form, focus on depth and control"
+                                },
+                                {
+                                    name: "Push-ups",
+                                    sets: "3",
+                                    reps: "12",
+                                    rest: "45s",
+                                    instructions: "Maintain plank position throughout movement"
+                                }
+                            ]
+                        },
+                        {
+                            day: "Thursday - Cardio & Core",
+                            focus: "Endurance & Stability",
+                            exercises: [
+                                {
+                                    name: "Jogging",
+                                    sets: "1",
+                                    reps: "20-30 minutes",
+                                    rest: "-",
+                                    instructions: "Moderate pace, focus on consistent breathing"
+                                },
+                                {
+                                    name: "Plank",
+                                    sets: "3",
+                                    reps: "45 seconds",
+                                    rest: "30s",
+                                    instructions: "Maintain straight body line, engage core"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                dietPlan: {
+                    description: "🥗 Balanced diet to maintain current weight with proper nutrition for energy and health",
+                    dailyCalories: "2000-2200",
+                    macronutrients: {
+                        protein: "70-80g",
+                        carbs: "250-280g",
+                        fats: "55-65g"
+                    },
+                    meals: {
+                        breakfast: "2 eggs + toast + fruit",
+                        lunch: "Balanced meal with protein, carbs, and vegetables",
+                        dinner: "Lean protein with vegetables and complex carbs",
+                        snacks: "Fruits, nuts, yogurt"
+                    }
+                },
+                motivationalTips: [
+                    "Consistency maintains results! 🎯",
+                    "Listen to your body and adjust as needed 👂",
+                    "Variety keeps workouts interesting 🔄"
+                ]
+            }
+        };
+
+        // Form submission
+        document.getElementById('fitnessForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const button = document.getElementById('generateBtn');
+            const originalText = button.innerHTML;
+            
+            // Show loading
+            button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> AI is generating your plan...';
+            button.disabled = true;
+
+            // Get form data
+            const formData = new FormData(e.target);
+            const userData = Object.fromEntries(formData);
+
+            // Simulate AI processing delay
+            setTimeout(() => {
+                try {
+                    const planData = generateAIPlan(userData);
+                    displayPlan(planData, userData);
+                } catch (error) {
+                    alert('Error generating plan. Please try again.');
+                    console.error(error);
+                } finally {
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                }
+            }, 1500); // 1.5 second delay to feel like AI
+        });
+
+        // AI Plan Generation
+        function generateAIPlan(userData) {
+            let basePlan = aiFitnessData[userData.goal] || aiFitnessData.weight_loss;
+            
+            // Create a deep copy
+            const personalizedPlan = JSON.parse(JSON.stringify(basePlan));
+            
+            // Personalize based on user data
+            personalizedPlan.workoutPlan.description = `Hey ${userData.name}! ${personalizedPlan.workoutPlan.description}`;
+            
+            // Adjust for fitness level
+            if (userData.level === 'beginner') {
+                personalizedPlan.workoutPlan.weeklySchedule.forEach(day => {
+                    day.exercises.forEach(exercise => {
+                        exercise.sets = String(parseInt(exercise.sets) - 1);
+                        exercise.reps = exercise.reps.split('-')[0] + "-" + (parseInt(exercise.reps.split('-')[1]) - 3);
+                    });
+                });
+            } else if (userData.level === 'advanced') {
+                personalizedPlan.workoutPlan.weeklySchedule.forEach(day => {
+                    day.exercises.forEach(exercise => {
+                        exercise.sets = String(parseInt(exercise.sets) + 1);
+                        if (!isNaN(parseInt(exercise.reps))) {
+                            exercise.reps = String(parseInt(exercise.reps) + 3);
+                        }
+                    });
+                });
+            }
+
+            // Adjust for workout location
+            if (userData.location === 'home') {
+                personalizedPlan.workoutPlan.description += " All exercises can be done at home with no equipment!";
+            }
+
+            return personalizedPlan;
+        }
+
+        // Display the generated plan
+        function displayPlan(planData, userData) {
+            const planDisplay = document.getElementById('planDisplay');
+            
+            planDisplay.innerHTML = `
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Your Personalized Fitness Plan</h2>
+                    <p class="text-gray-600">Generated specifically for ${userData.name}, ${userData.age} years old</p>
+                </div>
+
+                <div class="flex flex-wrap border-b border-gray-200 mb-6">
+                    <button onclick="showTab('workout')" class="tab-button px-4 py-2 font-medium border-b-2 border-blue-500 text-blue-600">
+                        🏋️ Workout Plan
+                    </button>
+                    <button onclick="showTab('diet')" class="tab-button px-4 py-2 font-medium text-gray-500 hover:text-gray-700">
+                        🥗 Diet Plan
+                    </button>
+                    <button onclick="showTab('tips')" class="tab-button px-4 py-2 font-medium text-gray-500 hover:text-gray-700">
+                        💡 Motivation
+                    </button>
+                </div>
+
+                <!-- Workout Tab -->
+                <div id="workoutTab" class="tab-content">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-semibold">Workout Plan</h3>
+                        <button onclick="speakText('${planData.workoutPlan.description.replace(/'/g, "\\'")}')" 
+                                class="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
+                            <i class="fas fa-volume-up"></i> Read Aloud
+                        </button>
+                    </div>
+                    
+                    <p class="text-gray-600 mb-6">${planData.workoutPlan.description}</p>
+                    
+                    <div class="space-y-6">
+                        ${planData.workoutPlan.weeklySchedule.map(day => `
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <h4 class="text-lg font-semibold text-blue-600 mb-2">
+                                    ${day.day} - ${day.focus}
+                                </h4>
+                                <div class="space-y-3">
+                                    ${day.exercises.map(exercise => `
+                                        <div class="bg-gray-50 p-3 rounded-lg">
+                                            <div class="flex justify-between items-start mb-2">
+                                                <h5 class="font-medium text-gray-800">${exercise.name}</h5>
+                                                <span class="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                                                    ${exercise.sets} sets × ${exercise.reps}
+                                                </span>
+                                            </div>
+                                            <p class="text-sm text-gray-600 mb-1">Rest: ${exercise.rest}</p>
+                                            <p class="text-sm text-gray-700">${exercise.instructions}</p>
+                                            <button onclick="speakText('${exercise.instructions.replace(/'/g, "\\'")}')" 
+                                                    class="text-blue-500 hover:text-blue-700 text-sm mt-2">
+                                                <i class="fas fa-volume-up mr-1"></i>Hear Instructions
+                                            </button>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- Diet Tab -->
+                <div id="dietTab" class="tab-content hidden">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-semibold">Diet Plan</h3>
+                        <button onclick="speakText('${planData.dietPlan.description.replace(/'/g, "\\'")}')" 
+                                class="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
+                            <i class="fas fa-volume-up"></i> Read Aloud
+                        </button>
+                    </div>
+                    
+                    <p class="text-gray-600 mb-4">${planData.dietPlan.description}</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-blue-50 p-4 rounded-lg text-center">
+                            <div class="text-2xl font-bold text-blue-600">${planData.dietPlan.dailyCalories}</div>
+                            <div class="text-sm text-gray-600">Daily Calories</div>
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-lg text-center">
+                            <div class="text-2xl font-bold text-green-600">${planData.dietPlan.macronutrients.protein}</div>
+                            <div class="text-sm text-gray-600">Protein (g)</div>
+                        </div>
+                        <div class="bg-orange-50 p-4 rounded-lg text-center">
+                            <div class="text-2xl font-bold text-orange-600">${planData.dietPlan.macronutrients.carbs}</div>
+                            <div class="text-sm text-gray-600">Carbs (g)</div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="border-l-4 border-green-500 pl-4">
+                            <h4 class="font-semibold text-gray-800">🍳 Breakfast</h4>
+                            <p class="text-gray-600">${planData.dietPlan.meals.breakfast}</p>
+                        </div>
+                        <div class="border-l-4 border-yellow-500 pl-4">
+                            <h4 class="font-semibold text-gray-800">🍽️ Lunch</h4>
+                            <p class="text-gray-600">${planData.dietPlan.meals.lunch}</p>
+                        </div>
+                        <div class="border-l-4 border-red-500 pl-4">
+                            <h4 class="font-semibold text-gray-800">🍲 Dinner</h4>
+                            <p class="text-gray-600">${planData.dietPlan.meals.dinner}</p>
+                        </div>
+                        <div class="border-l-4 border-purple-500 pl-4">
+                            <h4 class="font-semibold text-gray-800">🥨 Snacks</h4>
+                            <p class="text-gray-600">${planData.dietPlan.meals.snacks}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tips Tab -->
+                <div id="tipsTab" class="tab-content hidden">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-semibold">Motivational Tips</h3>
+                        <button onclick="speakText('${planData.motivationalTips.join('. ').replace(/'/g, "\\'")}')" 
+                                class="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
+                            <i class="fas fa-volume-up"></i> Read Aloud
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        ${planData.motivationalTips.map(tip => `
+                            <div class="flex items-start gap-3 bg-yellow-50 p-4 rounded-lg">
+                                <span class="text-2xl">💡</span>
+                                <p class="text-gray-700">${tip}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            planDisplay.classList.remove('hidden');
+            planDisplay.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Tab switching
+        function showTab(tabName) {
+            // Update buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('border-b-2', 'border-blue-500', 'text-blue-600');
+                btn.classList.add('text-gray-500');
+            });
+            event.target.classList.add('border-b-2', 'border-blue-500', 'text-blue-600');
+            event.target.classList.remove('text-gray-500');
+
+            // Update content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            document.getElementById(tabName + 'Tab').classList.remove('hidden');
+        }
+
+        // Text-to-Speech function
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                const speech = new SpeechSynthesisUtterance();
+                speech.text = text;
+                speech.volume = 1;
+                speech.rate = 1;
+                speech.pitch = 1;
+                window.speechSynthesis.speak(speech);
+            } else {
+                alert("Text-to-speech not supported in this browser. Try Chrome or Edge.");
+            }
+        }
+    </script>
+</body>
+</html>
